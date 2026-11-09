@@ -1,16 +1,67 @@
-:root { --bg: #FFCE00; --ink: #000; --muted: #5E4B00; --line: rgba(0,0,0,0.14); }
+/* Quixote brand: the app icon's sunset. Course colors appear only on the language chips. */
+:root {
+  --bg: #FFF6E9;
+  --ink: #3A140C;
+  --maroon: #602418;
+  --orange: #E4783C;
+  --muted: #8A4A2A;
+  --line: #F0D2AE;
+  --tile: #FBE6CC;
+}
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
-.page { max-width: 680px; margin: 0 auto; padding: 48px 20px 80px; }
-h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 44px; line-height: 1.1; margin: 8px 0 4px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  border-top: 8px solid var(--orange);
+}
+.page { max-width: 720px; margin: 0 auto; padding: 48px 20px 64px; }
+a { color: var(--maroon); }
+h1, .brand-name { font-family: Georgia, "Times New Roman", serif; font-weight: 400; color: var(--maroon); }
+h1 { font-size: 44px; line-height: 1.1; margin: 8px 0 4px; }
 h2 { font-size: 19px; margin: 36px 0 6px; padding-top: 18px; border-top: 1px solid var(--line); }
 p, li { margin: 0 0 12px; }
 ul { padding-left: 20px; }
-a { color: var(--ink); }
 .muted { color: var(--muted); }
 .back { display: inline-block; color: var(--muted); text-decoration: none; margin-bottom: 18px; }
-.hero { padding-top: 18vh; }
-.hero h1 { font-size: 64px; }
-.lede { font-size: 21px; max-width: 30ch; }
-footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 15px; }
-footer a { color: var(--muted); margin-right: 16px; }
+
+/* Home */
+.brand { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.brand img { width: 56px; height: 56px; border-radius: 13px; }
+.brand-name { font-size: 54px; line-height: 1; margin: 0; }
+.lede { font-size: 21px; line-height: 1.45; max-width: 30ch; margin-bottom: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 24px; }
+.chip { font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 14px; }
+.chip.de { background: #FFCE00; color: #000; }
+.chip.es { background: #006847; color: #fff; }
+.chip.fr { background: #002395; color: #fff; }
+.chip-note { font-size: 13px; color: var(--muted); padding-left: 4px; }
+.cta { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.button {
+  display: inline-block; background: var(--maroon); color: var(--bg); text-decoration: none;
+  border-radius: 14px; padding: 15px 24px; font-size: 17px; font-weight: 600;
+}
+.button:hover { background: #4A1A10; }
+.cta-note { font-size: 13px; color: var(--muted); }
+.section { border-top: 1px solid var(--line); margin-top: 32px; padding-top: 22px; }
+.eyebrow { font-size: 11px; letter-spacing: 1.5px; font-weight: 600; color: var(--orange); margin: 0 0 10px; }
+.headline { font-family: Georgia, "Times New Roman", serif; font-size: 30px; line-height: 1.25; color: var(--maroon); max-width: 24ch; margin: 0 0 12px; }
+.body { max-width: 54ch; font-size: 16px; line-height: 1.65; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 18px 0; }
+.stat { background: var(--tile); border-radius: 12px; padding: 14px 16px; }
+.stat b { display: block; font-size: 28px; font-weight: 600; color: var(--maroon); line-height: 1.2; }
+.stat span { font-size: 13px; color: var(--muted); line-height: 1.4; display: block; margin-top: 2px; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; }
+.step b { display: block; font-size: 24px; color: var(--orange); }
+.step strong { display: block; font-size: 15px; margin: 2px 0; }
+.step span { font-size: 13px; color: var(--muted); line-height: 1.45; display: block; }
+.small { font-size: 14px; color: var(--muted); margin-top: 24px; }
+footer { margin-top: 48px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+footer a { color: var(--muted); margin-right: 18px; }
+@media (max-width: 480px) {
+  .brand-name { font-size: 44px; }
+  .brand img { width: 46px; height: 46px; }
+  .lede { font-size: 19px; }
+  .headline { font-size: 26px; }
+}
