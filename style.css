@@ -44,6 +44,13 @@ ul { padding-left: 20px; }
 }
 .button:hover { background: #4A1A10; }
 .cta-note { font-size: 13px; color: var(--muted); }
+.join { margin-top: 4px; }
+.join-step { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px; }
+.join-step > b { font-size: 24px; color: var(--orange); line-height: 1.6; width: 18px; }
+.join-step span { display: block; font-size: 13px; color: var(--muted); line-height: 1.45; margin-top: 6px; max-width: 40ch; }
+.button.secondary { background: transparent; color: var(--maroon); box-shadow: inset 0 0 0 1.5px var(--maroon); padding: 12px 20px; font-size: 16px; }
+.button.secondary:hover { background: var(--tile); }
+.join-tip { font-size: 13px; color: var(--muted); background: var(--tile); border-radius: 10px; padding: 10px 14px; max-width: 52ch; }
 .section { border-top: 1px solid var(--line); margin-top: 32px; padding-top: 22px; }
 .eyebrow { font-size: 11px; letter-spacing: 1.5px; font-weight: 600; color: var(--orange); margin: 0 0 10px; }
 .headline { font-family: Georgia, "Times New Roman", serif; font-size: 30px; line-height: 1.25; color: var(--maroon); max-width: 24ch; margin: 0 0 12px; }
