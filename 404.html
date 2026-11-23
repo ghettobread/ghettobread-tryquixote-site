@@ -37,6 +37,7 @@
   .theme-btn { height: 52px; border-radius: 16px; background: var(--tile); border: 1px solid var(--line); padding: 0 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--ink); }
   .mini { width: 30px; height: 20px; border-radius: 3px; overflow: hidden; display: flex; box-shadow: 0 0 0 1px rgba(0,0,0,.25); }
   .mini span { flex: 1; }
+  .mini svg { display: block; width: 30px; height: 20px; }
   .menu { position: absolute; right: 0; top: 62px; z-index: 10; width: min(640px, calc(100vw - 48px)); background: var(--tile); border: 1px solid var(--line); border-radius: 20px; padding: 18px; box-shadow: 0 18px 48px rgba(0,0,0,.28); display: none; }
   .menu.open { display: block; }
   .menu h3 { margin: 0 0 12px; font-size: 12px; letter-spacing: 1.5px; color: var(--muted); }
@@ -109,6 +110,37 @@ posthog.register({ source: 'website' });
     bike: ['#E5E5E5', '<path d="M18 44a9 9 0 1 0 .01 0zM46 44a9 9 0 1 0 .01 0zM18 44l10-16h12l6 16M28 28l8 16h-18" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'],
     bus: ['#FFCE00', '<path d="M12 16h40v30H12z" fill="#111"/><path d="M16 20h32v11H16zM18 50a4 4 0 1 0 .01 0zM46 50a4 4 0 1 0 .01 0z" fill="#FFF"/>']
   };
+  function star(cx, cy, R, n, rot) {
+    var pts = [], k = n || 5, a0 = (rot || -90) * Math.PI / 180;
+    for (var i = 0; i < k * 2; i++) { var rr = i % 2 ? R * 0.42 : R, a = a0 + i * Math.PI / k; pts.push((cx + rr * Math.cos(a)).toFixed(2) + ',' + (cy + rr * Math.sin(a)).toFixed(2)); }
+    return '<polygon points="' + pts.join(' ') + '"/>';
+  }
+  function hz(a) { var h = 20 / a.length; return a.map(function (c, i) { return '<rect y="' + i * h + '" width="30" height="' + h + '" fill="' + c + '"/>'; }).join(''); }
+  function vt(a) { var w = 30 / a.length; return a.map(function (c, i) { return '<rect x="' + i * w + '" width="' + w + '" height="20" fill="' + c + '"/>'; }).join(''); }
+  function tri(cx, cy, ang, pat) {
+    var out = '';
+    for (var k = 0; k < 3; k++) {
+      var y = cy - 1.6 + k * 1.6;
+      out += pat[k] === 1 ? '<rect x="' + (cx - 2.4) + '" y="' + (y - 0.5) + '" width="4.8" height="1"/>'
+        : '<rect x="' + (cx - 2.4) + '" y="' + (y - 0.5) + '" width="2.1" height="1"/><rect x="' + (cx + 0.3) + '" y="' + (y - 0.5) + '" width="2.1" height="1"/>';
+    }
+    return '<g transform="rotate(' + ang + ' ' + cx + ' ' + cy + ')">' + out + '</g>';
+  }
+  var KO_BARS = '<g fill="#000">' + tri(5, 4, -56, [1, 1, 1]) + tri(25, 16, -56, [0, 0, 0]) + tri(25, 4, 56, [0, 1, 0]) + tri(5, 16, 56, [1, 0, 1]) + '</g>';
+  var FLAG_SVG = {
+    quixote: vt(['#FFF6E9', '#E4783C', '#602418']),
+    es: vt(['#006847', '#FFFFFF', '#CE1126']) + '<circle cx="15" cy="10" r="2.6" fill="#8C5A2B" stroke="#4E7A2E" stroke-width="0.8"/>',
+    fr: vt(['#0055A4', '#FFFFFF', '#EF4135']),
+    de: hz(['#000000', '#DD0000', '#FFCE00']),
+    it: vt(['#009246', '#FFFFFF', '#CE2B37']),
+    ar: hz(['#000000', '#FFFFFF', '#007A3D']) + '<polygon points="0,0 15,10 0,20" fill="#CE1126"/><g fill="#FFFFFF">' + star(5, 10, 1.8, 7) + '</g>',
+    ja: '<rect width="30" height="20" fill="#FFFFFF"/><circle cx="15" cy="10" r="6" fill="#BC002D"/>',
+    ko: '<rect width="30" height="20" fill="#FFFFFF"/><g transform="rotate(34 15 10)"><path d="M10 10a5 5 0 0 1 10 0z" fill="#CD2E3A"/><path d="M10 10a5 5 0 0 0 10 0z" fill="#0047A0"/><circle cx="12.5" cy="10" r="2.5" fill="#CD2E3A"/><circle cx="17.5" cy="10" r="2.5" fill="#0047A0"/></g>' + KO_BARS,
+    zh: '<rect width="30" height="20" fill="#DE2910"/><g fill="#FFDE00">' + star(5, 5, 3) + star(10, 2, 1, 5, -60) + star(12, 4, 1, 5, -80) + star(12, 7, 1, 5, -100) + star(10, 9, 1, 5, -120) + '</g>',
+    pt: '<rect width="30" height="20" fill="#009C3B"/><polygon points="15,2 28,10 15,18 2,10" fill="#FFDF00"/><circle cx="15" cy="10" r="4.6" fill="#002776"/><path d="M10.6 9.2q4.4-1.6 8.8 1" stroke="#FFFFFF" stroke-width="0.8" fill="none"/>',
+    hi: hz(['#FF9933', '#FFFFFF', '#138808']) + '<circle cx="15" cy="10" r="2.6" fill="none" stroke="#000080" stroke-width="0.7"/><circle cx="15" cy="10" r="0.6" fill="#000080"/><g stroke="#000080" stroke-width="0.25"><path d="M15 7.4v5.2M12.4 10h5.2M13.2 8.2l3.6 3.6M16.8 8.2l-3.6 3.6"/></g>'
+  };
+  function flagSvg(t) { return '<span class="mini"><svg viewBox="0 0 30 20" width="30" height="20" aria-hidden="true">' + (FLAG_SVG[t.id] || '') + '</svg></span>'; }
   var BELTS = [['White', '#F4F4F4', 0], ['Blue', '#2563C9', 3], ['Purple', '#7B3FBF', 10], ['Brown', '#7A4B26', 20], ['Black', '#1A1A1A', 40]];
   var LANGS = { de: 'German', es: 'Spanish', fr: 'French' };
   var MILES = { US: 1, GB: 1, LR: 1, MM: 1, 'GB-SCT': 1 };
@@ -198,9 +230,9 @@ posthog.register({ source: 'website' });
       applyTheme(current);
       document.getElementById('stripe').innerHTML = current.flag.map(function (c) { return '<span style="background:' + c + '"></span>'; }).join('');
       document.getElementById('stripe').style.flexDirection = current.dir;
-      document.getElementById('themeMini').innerHTML = stripes(current, 'mini');
+      document.getElementById('themeMini').innerHTML = flagSvg(current);
       grid.innerHTML = THEMES.map(function (t) {
-        return '<button class="opt" data-id="' + t.id + '" aria-pressed="' + (t.id === current.id) + '">' + stripes(t, 'mini') + '<span>' + esc(t.name) + '</span><span class="sw"><span style="background:' + t.bg + '"></span><span style="background:' + t.accent + '"></span><span style="background:' + t.second + '"></span></span></button>';
+        return '<button class="opt" data-id="' + t.id + '" aria-pressed="' + (t.id === current.id) + '">' + flagSvg(t) + '<span>' + esc(t.name) + '</span><span class="sw"><span style="background:' + t.bg + '"></span><span style="background:' + t.accent + '"></span><span style="background:' + t.second + '"></span></span></button>';
       }).join('');
       var n = document.getElementById('notice');
       n.className = 'notice' + (current.id !== owner.id ? ' on' : '');
