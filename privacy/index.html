@@ -38,12 +38,13 @@ document.addEventListener('click', function (e) {
 <main class="page">
   <a class="back" href="/">‹ Quixote</a>
   <h1>Privacy policy</h1>
-  <p class="muted">Last updated November 12, 2026</p>
+  <p class="muted">Last updated November 22, 2026</p>
 
-  <p>Quixote is a hands-free language app for your commute. It’s in beta, and this page explains in plain words what it collects and why. Short version: no account, no email, no recordings of your voice. If you share usage (on by default, easy to turn off), the app sends how you use it and the text of your spoken answers, under a random ID.</p>
+  <p>Quixote is a hands-free language app for your commute. It’s in beta, and this page explains in plain words what it collects and why. Short version: no recordings of your voice, ever. You can use the app without an account. If you share usage (on by default, easy to turn off), the app sends how you use it and the text of your spoken answers, under a random ID. If you make a profile, we store it so it follows you to a new phone, and it’s public unless you set it to private.</p>
 
   <h2>What stays on your phone</h2>
-  <p>Your progress, scores, settings, the name or nickname you choose, and anything you tell the characters about yourself in story episodes are saved on your phone. Deleting the app deletes them.</p>
+  <p>Your progress, scores, settings, the name or nickname you choose, how you usually get around, and anything you tell the characters about yourself in story episodes are saved on your phone. Deleting the app deletes them (unless you have a profile, below).</p>
+  <p><strong>Distance learned</strong> is an estimate the app works out on your phone, from your learning time and how you said you usually get around. The app doesn’t read your location for it.</p>
 
   <h2>What the app sends, if you share usage</h2>
   <ul>
@@ -53,11 +54,21 @@ document.addEventListener('click', function (e) {
     <li><strong>Your device:</strong> phone model, iOS version, app version, which language you’re learning, and a tester code if you entered one.</li>
     <li><strong>Approximate location</strong> (city, region, country), estimated from your internet connection by our analytics provider. We don’t use GPS.</li>
     <li><strong>Feedback you send</strong> from the app, including voice notes: if you say “note” during a lesson, what you say next is sent as text, as your phone recognized it, with the lesson and step you were on. Your voice itself is never recorded or sent. Feedback is sent even if usage sharing is off, because sending it is your choice each time.</li>
-    <li><strong>Your name or nickname</strong>, only if the app doesn’t already have it recorded, so we can record a voice clip of it for the lessons.</li>
   </ul>
 
+  <h2>If you make a profile</h2>
+  <p>Profiles are optional. You sign in with Apple or Google, and we store your profile with Supabase so it’s backed up and follows you to a new phone.</p>
+  <ul>
+    <li><strong>From your sign-in:</strong> an account ID and your email address (with Sign in with Apple, you can hide your email, and Apple gives us a private relay address instead). We use your email only for your account and launch rewards.</li>
+    <li><strong>What you choose to add:</strong> your name, a username, a picture from our set of avatars (you can’t upload photos yet), up to two flags for where you or your family are from, and the colors of your page. All of these are optional except the username.</li>
+    <li><strong>Your progress:</strong> your belt, learning time, lessons finished, scores, languages, and the distance estimate, so they can be restored on a new phone.</li>
+    <li><strong>Your invite link</strong>, so referral rewards go to the right people.</li>
+  </ul>
+  <p><strong>Public or private.</strong> Profiles start public: anyone with the link to your page (tryquixote.com/u/your-username) can see your name, username, avatar, flags, belt, learning time, distance estimate, and languages. Your page never shows where or when you travel, your answers, or your scores. You can set your profile to private at any time in Settings: then only you can see it, nobody can look up your username, and your invite link still works.</p>
+  <p><strong>Reporting.</strong> If you see a profile with offensive content, use the Report link on the page or email us, and we’ll review it and remove what breaks our rules.</p>
+
   <h2>What we don’t collect</h2>
-  <p>We never record, store, or upload your voice. We don’t collect your email (unless you join the launch list, below), contacts, photos, precise location, or advertising identifiers, and there are no ads.</p>
+  <p>We never record, store, or upload your voice. We don’t collect your email (unless you make a profile or join the launch list), contacts, photos, precise location, or advertising identifiers, and there are no ads.</p>
 
   <h2>Speech recognition</h2>
   <p>To understand your answers, Quixote uses Apple’s built-in speech recognition. Depending on your iPhone and language, Apple may process the audio on its servers. That’s covered by Apple’s privacy policy, and Apple doesn’t share the audio with us. We only receive the recognized text described above.</p>
@@ -71,20 +82,24 @@ document.addEventListener('click', function (e) {
   <h2>Who helps us run Quixote</h2>
   <ul>
     <li><strong>PostHog</strong> (analytics, United States) receives the usage data above and the website visit counts.</li>
+    <li><strong>Supabase</strong> (database and sign-in) stores profiles, if you make one.</li>
+    <li><strong>Google</strong> provides Sign in with Google, if you choose it.</li>
     <li><strong>Tally</strong> hosts the launch-list form.</li>
-    <li><strong>Apple</strong> provides speech recognition, TestFlight, and the App Store.</li>
+    <li><strong>Apple</strong> provides speech recognition, Sign in with Apple, TestFlight, and the App Store.</li>
     <li><strong>Expo</strong> delivers app updates. Like any download, it sees your internet address.</li>
-    <li><strong>ElevenLabs</strong> records the voice clips. The only thing of yours it ever receives is a name or nickname we record a clip for.</li>
+    <li><strong>ElevenLabs</strong> records the voice clips for the lessons. It receives nothing of yours.</li>
   </ul>
   <p>We don’t sell your data or share it with anyone else.</p>
 
   <h2>How long we keep it</h2>
-  <p>Usage data is kept while Quixote is in beta and development, to improve the lessons. Launch-list emails are kept until launch rewards are given out or you ask us to delete them.</p>
+  <p>Usage data is kept while Quixote is in beta and development, to improve the lessons. Profiles are kept until you delete your account. Launch-list emails are kept until launch rewards are given out or you ask us to delete them.</p>
 
   <h2>Your choices</h2>
   <ul>
     <li><strong>Turn off sharing:</strong> in the app, open Progress and settings and switch off Share usage. Nothing more is sent, and anything waiting to be sent is cleared.</li>
-    <li><strong>Delete your data:</strong> email us. Include your tester code if you set one, or the email you used for the launch list. Because the app has no accounts, we may not be able to find usage data that can’t be matched to you.</li>
+    <li><strong>Make your profile private</strong> in Settings, at any time.</li>
+    <li><strong>Delete your account</strong> in the app (Profile, then Delete account and data). This deletes your profile and synced progress.</li>
+    <li><strong>Delete your other data:</strong> email us. Include your tester code if you set one, or the email you used for the launch list. We may not be able to find usage data that can’t be matched to you.</li>
     <li><strong>Leave the launch list</strong> at any time by emailing us.</li>
   </ul>
 
