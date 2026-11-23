@@ -84,5 +84,16 @@ document.addEventListener('click', function (e) {
     <a href="mailto:don@tryquixote.com">don@tryquixote.com</a>
   </footer>
 </main>
+<script>
+// Invite links from profiles (tryquixote.com/?ref=CODE): pass the inviter's code on to the
+// launch-list form, so both people get their 3 free months.
+(function () {
+  var ref = new URLSearchParams(location.search).get('ref');
+  if (!ref || !/^[a-z0-9]{4,16}$/i.test(ref)) return;
+  document.querySelectorAll('a[href*="tally.so"]').forEach(function (a) {
+    var u = new URL(a.href); u.searchParams.set('ref', ref); a.href = u.toString();
+  });
+})();
+</script>
 </body>
 </html>
