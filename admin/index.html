@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quixote stats</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<!--
+  Private stats page (Nov 25, 2026): tryquixote.com/admin/
+  Sign in with Apple or Google (the same Supabase accounts as the app). The page calls the
+  Supabase Edge Function `admin-stats`, which only answers for the owner's user id and
+  fetches the PostHog endpoint `quixote_admin_daily` server-side. No secrets live here:
+  the key below is Supabase's publishable key (public by design).
+  Staying signed in: the session is kept in this browser's localStorage and refreshed
+  automatically, so a bookmark opens straight to the stats.
+  No PostHog snippet on purpose: the owner's visits here shouldn't count as site traffic.
+-->
+<style>
+  :root { --bg:#FFF6E9; --tile:#FBE6CC; --line:#F0D2AE; --ink:#3A140C; --muted:#8A4A2A; --accent:#E4783C; --second:#602418; --head:Georgia,'Times New Roman',serif; --body:-apple-system,system-ui,'Segoe UI',Helvetica,Arial,sans-serif; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); }
+  a { color: var(--second); }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 32px 24px 56px; display: flex; flex-direction: column; gap: 24px; }
+  header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+  .title { margin: 0; font-family: var(--head); font-size: 30px; color: var(--second); }
+  .lbl { font-size: 13px; color: var(--muted); margin: 0; }
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .seg { display: flex; background: var(--tile); border-radius: 999px; padding: 4px; }
+  .seg button { border: 0; background: transparent; color: var(--second); font: inherit; font-size: 14px; padding: 10px 16px; border-radius: 999px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--second); color: var(--bg); }
+  .check { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--second); padding: 10px 4px; }
+  .check input { width: 18px; height: 18px; accent-color: var(--second); }
+  .linkbtn { background: none; border: 0; font: inherit; font-size: 14px; color: var(--second); text-decoration: underline; cursor: pointer; padding: 10px 4px; }
+  .grid4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 16px; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 20px; min-width: 0; }
+  .big { font-family: var(--head); font-size: 40px; margin: 6px 0 4px; }
+  h2 { font-family: var(--head); font-size: 20px; font-weight: normal; margin: 0 0 14px; }
+  .bars { display: flex; align-items: flex-end; gap: 3px; height: 160px; border-bottom: 1px solid var(--line); }
+  .bars div { flex: 1; min-width: 2px; border-radius: 3px 3px 0 0; }
+  .axis { display: flex; justify-content: space-between; margin-top: 8px; }
+  .meter { height: 10px; background: var(--tile); border-radius: 5px; margin-top: 6px; }
+  .meter div { height: 10px; background: var(--accent); border-radius: 5px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  td, th { padding: 8px 6px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: normal; }
+  .center { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .signin { width: 100%; max-width: 400px; background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 36px 32px; display: flex; flex-direction: column; gap: 16px; text-align: center; }
+  .btn { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; border-radius: 12px; text-decoration: none; font-size: 16px; border: 1px solid var(--line); background: #fff; color: var(--ink); cursor: pointer; font-family: inherit; }
+  .btn.dark { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .note { background: var(--tile); border-radius: 10px; padding: 12px; font-size: 14px; color: var(--second); line-height: 1.45; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="signin" class="center" hidden>
+  <div class="signin">
+    <svg aria-hidden="true" width="56" height="40" viewBox="0 0 56 40" style="margin:0 auto"><path d="M2 38 L20 10 L30 24 L38 14 L54 38 Z" fill="none" stroke="#602418" stroke-width="2.5" stroke-linejoin="round"/></svg>
+    <p class="title" style="font-size:28px">Quixote stats</p>
+    <p id="signin-msg" style="margin:0;font-size:15px;color:var(--muted);line-height:1.5">Sign in with the account you use in the app. This page is only for Quixote's owner. You'll stay signed in on this browser.</p>
+    <button class="btn dark" data-provider="apple" type="button">Continue with Apple</button>
+    <button class="btn" data-provider="google" type="button">Continue with Google</button>
+    <a href="/" style="font-size:14px">Back to tryquixote.com</a>
+  </div>
+</div>
+
+<div id="denied" class="center" hidden>
+  <div class="signin">
+    <p class="title" style="font-size:28px">This page isn't for your account</p>
+    <p id="denied-msg" class="note"></p>
+    <button class="btn" id="denied-out" type="button">Sign out</button>
+    <a href="/" style="font-size:14px">Back to tryquixote.com</a>
+  </div>
+</div>
+
+<div id="loading" class="center"><p class="lbl" role="status">Loading…</p></div>
+
+<main id="stats" class="wrap" hidden>
+  <header>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <h1 class="title">Quixote · Stats</h1>
+      <p class="lbl" id="updated">Private. Only your account can open this page.</p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Date range">
+        <button type="button" data-days="7" aria-pressed="false">7 days</button>
+        <button type="button" data-days="30" aria-pressed="true">30 days</button>
+        <button type="button" data-days="90" aria-pressed="false">90 days</button>
+      </div>
+      <label class="check"><input type="checkbox" id="owner">Include my phones</label>
+      <button class="linkbtn" id="signout" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <section class="grid4" aria-label="Headline numbers">
+    <div class="card"><p class="lbl">Total learners</p><p class="big" id="k-learners">–</p><p class="lbl">All time · spoke or learned 1+ min</p></div>
+    <div class="card"><p class="lbl">Daily active users</p><p class="big" id="k-dau">–</p><p class="lbl" id="k-dau-sub">Average per day</p></div>
+    <div class="card"><p class="lbl">Sessions per user</p><p class="big" id="k-spu">–</p><p class="lbl" id="k-spu-sub">App opens per user</p></div>
+    <div class="card"><p class="lbl">Minutes per learner</p><p class="big" id="k-mpl">–</p><p class="lbl" id="k-mpl-sub">Goal: 180 (blue belt)</p></div>
+  </section>
+
+  <section class="grid2">
+    <div class="card"><h2>Daily active users</h2><div class="bars" id="c-dau" role="img"></div><div class="axis"><span class="lbl" id="c-dau-from"></span><span class="lbl">Today</span></div></div>
+    <div class="card"><h2>Minutes learned per day</h2><div class="bars" id="c-min" role="img"></div><div class="axis"><span class="lbl" id="c-min-from"></span><span class="lbl">Today</span></div><p class="lbl" id="c-min-total" style="margin-top:10px"></p></div>
+  </section>
+
+  <section class="grid3">
+    <div class="card"><h2>Learners by language</h2><div id="langs" style="display:flex;flex-direction:column;gap:12px"></div></div>
+    <div class="card"><h2>Lessons completed</h2><p class="big" id="k-lessons" style="margin-top:0">–</p><p class="lbl" id="k-lessons-sub"></p></div>
+    <div class="card"><h2>Where learners are</h2><table id="cities"></table></div>
+  </section>
+
+  <section class="grid2">
+    <div class="card"><h2>Come back next week?</h2><div style="overflow-x:auto"><table id="retention" style="text-align:center"></table></div><p class="lbl" style="margin-top:8px">People by the week they first opened the app, and the share who opened it again in each later week. All time.</p></div>
+    <div class="card"><h2>Website → app</h2>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+        <div><p class="lbl">Visitors</p><p class="big" style="font-size:32px" id="w-vis">–</p></div>
+        <div><p class="lbl">TestFlight clicks</p><p class="big" style="font-size:32px" id="w-tf">–</p></div>
+        <div><p class="lbl">Launch list clicks</p><p class="big" style="font-size:32px" id="w-list">–</p></div>
+      </div>
+      <p class="lbl" style="margin-top:8px">Unique people in the range. Claude test visits left out.</p>
+    </div>
+  </section>
+
+  <p class="lbl" style="text-align:center" id="footnote">Not counted: Apple's reviewers (Cupertino). Numbers come from PostHog and refresh about every 15 minutes.</p>
+</main>
+
+<script>
+(function () {
+  var SUPABASE = 'https://exntmwlfnkxvxerklzfz.supabase.co';
+  var KEY = 'sb_publishable_ogPk11HKYRudifqfE2KYfQ_zc019uKG'; // publishable; the function decides access
+  var FN = SUPABASE + '/functions/v1/admin-stats';
+  var STORE = 'qx_admin_session';
+  var HERE = location.origin + '/admin/';
+  var $ = function (id) { return document.getElementById(id); };
+  var LANG = { de: 'German', es: 'Spanish', fr: 'French', it: 'Italian', ar: 'Arabic' };
+
+  function show(id) { ['signin', 'denied', 'loading', 'stats'].forEach(function (x) { $(x).hidden = x !== id; }); }
+  function load() { try { return JSON.parse(localStorage.getItem(STORE) || 'null'); } catch (e) { return null; } }
+  function save(s) { try { localStorage.setItem(STORE, JSON.stringify(s)); } catch (e) {} }
+  function clear() { try { localStorage.removeItem(STORE); } catch (e) {} }
+
+  // 1. Coming back from Apple/Google: Supabase puts the session in the URL hash.
+  var hash = new URLSearchParams(location.hash.slice(1));
+  if (hash.get('access_token') && hash.get('refresh_token')) {
+    save({ access_token: hash.get('access_token'), refresh_token: hash.get('refresh_token'),
+           expires_at: Math.floor(Date.now() / 1000) + Number(hash.get('expires_in') || 3600) });
+    history.replaceState(null, '', HERE);
+  } else if (hash.get('error_description')) {
+    $('signin-msg').textContent = 'Sign-in didn’t finish: ' + hash.get('error_description');
+    history.replaceState(null, '', HERE);
+  }
+
+  document.querySelectorAll('[data-provider]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      location.href = SUPABASE + '/auth/v1/authorize?provider=' + b.dataset.provider + '&redirect_to=' + encodeURIComponent(HERE);
+    });
+  });
+
+  function signOut() {
+    var s = load(); clear();
+    if (s) fetch(SUPABASE + '/auth/v1/logout', { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + s.access_token } }).catch(function () {});
+    show('signin');
+  }
+  $('signout').addEventListener('click', signOut);
+  $('denied-out').addEventListener('click', signOut);
+
+  // 2. Keep the session fresh (access tokens last ~1 h; the refresh token keeps you signed in).
+  function fresh() {
+    var s = load();
+    if (!s) return Promise.resolve(null);
+    if (s.expires_at - 60 > Date.now() / 1000) return Promise.resolve(s);
+    return fetch(SUPABASE + '/auth/v1/token?grant_type=refresh_token', {
+      method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: s.refresh_token })
+    }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (!j || !j.access_token) { clear(); return null; }
+      var n = { access_token: j.access_token, refresh_token: j.refresh_token,
+                expires_at: j.expires_at || Math.floor(Date.now() / 1000) + (j.expires_in || 3600) };
+      save(n); return n;
+    }).catch(function () { return s; });
+  }
+
+  // 3. Fetch rows from the function.
+  var rows = [], days = 30, withOwner = false;
+  function start() {
+    show('loading');
+    fresh().then(function (s) {
+      if (!s) { show('signin'); return; }
+      return fetch(FN, { headers: { apikey: KEY, Authorization: 'Bearer ' + s.access_token } }).then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (j) { return { status: r.status, body: j }; });
+      }).then(function (res) {
+        if (res.status === 401) { clear(); show('signin'); return; }
+        if (res.status === 403) { $('denied-msg').textContent = 'You’re signed in, but this account isn’t the owner’s. Sign out and use the account you set up as owner.'; show('denied'); return; }
+        if (res.status !== 200) { $('denied-msg').textContent = 'Couldn’t load the numbers (' + (res.body.error || res.status) + '). Try again in a minute.'; $('denied').querySelector('.title').textContent = 'Something went wrong'; show('denied'); return; }
+        rows = toObjects(res.body);
+        $('updated').textContent = 'Private. Only your account can open this page. Updated ' + new Date(res.body.fetched_at || Date.now()).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '.';
+        show('stats'); render();
+      });
+    }).catch(function () { $('denied-msg').textContent = 'Couldn’t reach the server. Check your connection and reload.'; show('denied'); });
+  }
+
+  var COLS = ['kind', 'day', 'pid', 'owner', 'city', 'langs', 'opens', 'turns', 'minutes', 'lessons', 'pageviews', 'tf_clicks', 'list_clicks'];
+  function toObjects(body) {
+    var cols = body.columns || COLS;
+    return (body.results || []).map(function (r) {
+      if (!Array.isArray(r)) return r;
+      var o = {}; cols.forEach(function (c, i) { o[c] = r[i]; }); return o;
+    }).map(function (o) {
+      o.owner = o.owner === true || o.owner === 1 || o.owner === '1';
+      ['opens', 'turns', 'minutes', 'lessons', 'pageviews', 'tf_clicks', 'list_clicks'].forEach(function (k) { o[k] = Number(o[k]) || 0; });
+      if (typeof o.langs === 'string') { try { o.langs = JSON.parse(o.langs.replace(/'/g, '"')); } catch (e) { o.langs = []; } }
+      o.langs = o.langs || [];
+      return o;
+    });
+  }
+
+  // 4. Number crunching, all in the browser.
+  function isoDay(d) { return d.toISOString().slice(0, 10); }
+  function dayList(n) { var out = [], t = new Date(); for (var i = n - 1; i >= 0; i--) { var d = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate() - i)); out.push(isoDay(d)); } return out; }
+  function uniq(list) { var s = {}; list.forEach(function (x) { s[x] = 1; }); return Object.keys(s).length; }
+  function fmt(n, dp) { return (Math.round(n * Math.pow(10, dp)) / Math.pow(10, dp)).toFixed(dp); }
+  function short(d) { return new Date(d + 'T12:00:00Z').toLocaleDateString([], { month: 'short', day: 'numeric', timeZone: 'UTC' }); }
+
+  function bars(el, list, color, label) {
+    var max = Math.max.apply(null, list.map(function (x) { return x.v; }).concat([1]));
+    el.innerHTML = '';
+    list.forEach(function (x) {
+      var b = document.createElement('div');
+      b.style.height = x.v ? Math.max(4, x.v / max * 100) + '%' : '2%';
+      b.style.background = x.v ? color : 'var(--line)';
+      b.title = short(x.d) + ': ' + (Math.round(x.v * 10) / 10);
+      el.appendChild(b);
+    });
+    el.setAttribute('aria-label', label);
+  }
+
+  function render() {
+    var app = rows.filter(function (r) { return r.kind === 'app' && (withOwner || !r.owner); });
+    var web = rows.filter(function (r) { return r.kind === 'web'; });
+    var range = dayList(days), from = range[0];
+    var inApp = app.filter(function (r) { return r.day >= from; });
+    var inWeb = web.filter(function (r) { return r.day >= from; });
+
+    // Learners, all time: spoke at least once or finished a minute.
+    var per = {};
+    app.forEach(function (r) { var p = per[r.pid] = per[r.pid] || { t: 0, m: 0 }; p.t += r.turns; p.m += r.minutes; });
+    $('k-learners').textContent = Object.keys(per).filter(function (k) { return per[k].t > 0 || per[k].m >= 1; }).length;
+
+    // Daily actives.
+    var byDay = {}; range.forEach(function (d) { byDay[d] = { users: 0, min: 0 }; });
+    inApp.forEach(function (r) { if (!byDay[r.day]) return; if (r.opens > 0) byDay[r.day].users++; byDay[r.day].min += r.minutes; });
+    var dauList = range.map(function (d) { return { d: d, v: byDay[d].users }; });
+    var total = dauList.reduce(function (a, x) { return a + x.v; }, 0);
+    var peak = dauList.reduce(function (a, x) { return x.v > a.v ? x : a; }, { v: 0 });
+    $('k-dau').textContent = fmt(total / days, 1);
+    $('k-dau-sub').textContent = 'Average per day' + (peak.v ? ' · peak ' + peak.v + ' on ' + short(peak.d) : '');
+    bars($('c-dau'), dauList, 'var(--accent)', 'Daily active users, last ' + days + ' days, peak ' + peak.v);
+    $('c-dau-from').textContent = short(from);
+
+    // Sessions (app opens) per user.
+    var opens = inApp.reduce(function (a, r) { return a + r.opens; }, 0);
+    var openers = uniq(inApp.filter(function (r) { return r.opens > 0; }).map(function (r) { return r.pid; }));
+    $('k-spu').textContent = openers ? fmt(opens / openers, 1) : '–';
+    $('k-spu-sub').textContent = 'App opens per user, last ' + days + ' days';
+
+    // Minutes.
+    var mins = {}; inApp.forEach(function (r) { mins[r.pid] = (mins[r.pid] || 0) + r.minutes; });
+    var minTotal = Object.keys(mins).reduce(function (a, k) { return a + mins[k]; }, 0);
+    var minLearners = Object.keys(mins).filter(function (k) { return mins[k] >= 1; }).length;
+    $('k-mpl').textContent = minLearners ? fmt(minTotal / minLearners, 1) : '–';
+    $('k-mpl-sub').textContent = 'Last ' + days + ' days · goal: 180 (blue belt)';
+    var minList = range.map(function (d) { return { d: d, v: byDay[d].min }; });
+    bars($('c-min'), minList, 'var(--second)', 'Minutes learned per day, ' + Math.round(minTotal) + ' total');
+    $('c-min-from').textContent = short(from);
+    $('c-min-total').textContent = Math.round(minTotal) + ' minutes total in this range.';
+
+    // Languages: people who started a lesson in each.
+    var langs = {};
+    inApp.forEach(function (r) { r.langs.forEach(function (l) { (langs[l] = langs[l] || {})[r.pid] = 1; }); });
+    var lk = Object.keys(langs).map(function (l) { return { l: l, n: Object.keys(langs[l]).length }; }).sort(function (a, b) { return b.n - a.n; });
+    var lmax = lk.length ? lk[0].n : 1;
+    $('langs').innerHTML = lk.length ? lk.map(function (x) {
+      return '<div><div style="display:flex;justify-content:space-between;font-size:14px"><span>' + (LANG[x.l] || x.l) + '</span><span>' + x.n + '</span></div><div class="meter"><div style="width:' + (x.n / lmax * 100) + '%"></div></div></div>';
+    }).join('') : '<p class="lbl">No lessons started in this range.</p>';
+
+    // Lessons completed, by week.
+    var lessons = inApp.reduce(function (a, r) { return a + r.lessons; }, 0);
+    $('k-lessons').textContent = lessons;
+    $('k-lessons-sub').textContent = 'Last ' + days + ' days';
+
+    // Cities: each learner's most recent city.
+    var city = {};
+    inApp.slice().sort(function (a, b) { return a.day < b.day ? -1 : 1; }).forEach(function (r) { if (r.city) city[r.pid] = r.city; });
+    var cc = {}; Object.keys(city).forEach(function (p) { cc[city[p]] = (cc[city[p]] || 0) + 1; });
+    var cl = Object.keys(cc).sort(function (a, b) { return cc[b] - cc[a]; });
+    $('cities').innerHTML = cl.length ? cl.slice(0, 8).map(function (c) { return '<tr><td>' + c.replace(/</g, '&lt;') + '</td><td style="text-align:right">' + cc[c] + '</td></tr>'; }).join('') : '<tr><td class="lbl">No locations in this range.</td></tr>';
+
+    // Retention, all time: weeks start Sunday (UTC), like PostHog.
+    function week(d) { var t = new Date(d + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() - t.getUTCDay()); return isoDay(t); }
+    var first = {}, active = {};
+    app.filter(function (r) { return r.opens > 0; }).forEach(function (r) {
+      var w = week(r.day); if (!first[r.pid] || w < first[r.pid]) first[r.pid] = w; (active[r.pid] = active[r.pid] || {})[w] = 1;
+    });
+    var cohorts = {}; Object.keys(first).forEach(function (p) { (cohorts[first[p]] = cohorts[first[p]] || []).push(p); });
+    var weeks = Object.keys(cohorts).sort().slice(-4);
+    var head = '<tr><th style="text-align:left">First week</th><th>People</th><th>Wk 1</th><th>Wk 2</th><th>Wk 3</th></tr>';
+    $('retention').innerHTML = head + (weeks.length ? weeks.map(function (w) {
+      var ps = cohorts[w], cells = '';
+      for (var i = 1; i <= 3; i++) {
+        var t = new Date(w + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() + 7 * i); var wk = isoDay(t);
+        if (wk > isoDay(new Date())) { cells += '<td></td>'; continue; }
+        var back = ps.filter(function (p) { return active[p][wk]; }).length, pct = Math.round(back / ps.length * 100);
+        cells += '<td style="background:' + (pct ? 'var(--accent)' : 'var(--tile)') + '">' + pct + '%</td>';
+      }
+      return '<tr><td style="text-align:left">' + short(w) + '</td><td>' + ps.length + '</td>' + cells + '</tr>';
+    }).join('') : '<tr><td colspan="5" class="lbl">No app opens yet.</td></tr>');
+
+    // Website.
+    $('w-vis').textContent = uniq(inWeb.filter(function (r) { return r.pageviews > 0; }).map(function (r) { return r.pid; }));
+    $('w-tf').textContent = uniq(inWeb.filter(function (r) { return r.tf_clicks > 0; }).map(function (r) { return r.pid; }));
+    $('w-list').textContent = uniq(inWeb.filter(function (r) { return r.list_clicks > 0; }).map(function (r) { return r.pid; }));
+
+    $('footnote').textContent = 'Not counted: Apple’s reviewers (Cupertino)' + (withOwner ? '' : ' and your 3 test phones') + '. Numbers come from PostHog and refresh about every 15 minutes.';
+  }
+
+  document.querySelectorAll('[data-days]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      days = Number(b.dataset.days);
+      document.querySelectorAll('[data-days]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      render();
+    });
+  });
+  $('owner').addEventListener('change', function (e) { withOwner = e.target.checked; render(); });
+
+  start();
+})();
+</script>
+</body>
+</html>
